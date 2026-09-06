@@ -1,4 +1,5 @@
 import express from "express";
+import cors from "cors";
 import apiRouter from "./routes/apiRoutes.js";
 import {
   errorHandler,
@@ -6,6 +7,7 @@ import {
 } from "./middleware/errorHandler.js";
 
 const app = express();
+app.use(cors());
 const port = Number(process.env.PORT ?? 3001);
 
 app.use(express.json());
