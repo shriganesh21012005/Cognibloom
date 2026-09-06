@@ -1,0 +1,61 @@
+We are building a small candidate-assignment prototype called "CogniBloom – Active Learning Tutor".
+
+Read the following product requirements carefully before making changes:
+
+The application must improve the learning experience after an AI explanation instead of allowing the student to simply read the answer and leave.
+
+Core flow:
+
+1. Student enters or selects a learning topic.
+2. Student asks a question.
+3. System provides an explanation.
+4. Student interacts with an active-learning mechanism.
+5. System evaluates the interaction and gives an appropriate response.
+6. Student can continue or finish the learning session.
+
+We are intentionally building a SMALL, polished prototype rather than a large application.
+
+TECH STACK:
+- Frontend: React + TypeScript + Vite
+- Styling: Tailwind CSS
+- Backend: Node.js + Express + TypeScript
+- Database: SQLite
+- ORM: Prisma
+- REST APIs
+- AI responses will initially be mocked. Do NOT integrate an external LLM API.
+
+IMPORTANT:
+Do not build the complete application yet.
+
+For this task ONLY:
+
+1. Inspect the current Replit project.
+2. Set up a clean frontend/backend project structure.
+3. Configure TypeScript.
+4. Configure Tailwind.
+5. Configure Express.
+6. Configure Prisma with SQLite.
+7. Create a basic health-check API:
+   GET /api/health
+8. Create a minimal frontend page proving the frontend is running.
+9. Make sure frontend and backend can run successfully.
+10. Add a .gitignore.
+11. Add a README.md containing:
+   - Project name
+   - Short description
+   - Tech stack
+   - How to run the project
+12. Do NOT implement learning functionality yet.
+13. Do NOT add authentication.
+14. Do NOT add an external AI API.
+15. Do NOT install unnecessary libraries.
+
+Before finishing, verify that the project builds/runs without errors.
+
+At the end, give me:
+- files created/modified
+- commands used
+- current project structure
+- confirmation that frontend and backend run successfully
+
+STOP after completing this task. Do not continue to later features.

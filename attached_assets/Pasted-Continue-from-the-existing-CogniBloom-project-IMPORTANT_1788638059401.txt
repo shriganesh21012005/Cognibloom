@@ -1,0 +1,432 @@
+Continue from the existing CogniBloom project.
+
+IMPORTANT:
+The backend, REST APIs, database, Prisma layer and migrations are already COMPLETE and VERIFIED.
+
+DO NOT rebuild them.
+
+DO NOT:
+- redesign the Prisma schema
+- create another database
+- create duplicate APIs
+- add authentication
+- integrate an external AI API
+- replace the existing backend
+- rewrite working backend services
+- create unnecessary features
+
+The existing backend APIs are:
+
+POST /api/sessions
+POST /api/questions
+GET /api/sessions/:id
+POST /api/interactions
+POST /api/feedback
+
+The backend uses:
+React frontend
+→ REST API
+→ controllers
+→ mock/domain services
+→ database service
+→ Prisma
+→ SQLite
+
+Now implement ONLY the frontend learning experience using the existing APIs.
+
+==================================================
+PRODUCT CONCEPT
+==================================================
+
+CogniBloom is an Active Learning Tutor.
+
+The problem is:
+
+Student asks AI a question
+→ AI gives technically correct explanation
+→ student reads it
+→ student leaves
+
+Our product changes this to:
+
+Student asks question
+↓
+AI explanation
+↓
+"Let's check your understanding"
+↓
+Student explains the concept in their own words
+↓
+System evaluates response
+↓
+Targeted feedback
+↓
+Retry OR continue
+↓
+Learning session completion
+
+The concept-check interaction is the CORE product feature.
+
+==================================================
+SCREEN 1 — START LEARNING
+==================================================
+
+Create a clean starting screen.
+
+The student should enter:
+
+Topic
+Question
+
+Example:
+
+Topic:
+Photosynthesis
+
+Question:
+What is photosynthesis?
+
+Primary button:
+
+"Start Learning"
+
+Validation:
+- topic cannot be empty
+- question cannot be empty
+- show clear inline validation
+
+When submitted:
+
+1. Call POST /api/sessions
+2. Store the returned session ID
+3. Call POST /api/questions
+4. Move to the explanation stage
+
+Show a loading state while the API calls are running.
+
+Prevent duplicate submissions.
+
+==================================================
+SCREEN 2 — AI EXPLANATION
+==================================================
+
+Display:
+
+- topic
+- student's question
+- AI explanation
+
+Use the explanation returned by the backend.
+
+IMPORTANT:
+
+Do NOT show a final "Done" button immediately after the explanation.
+
+Instead create a clear transition:
+
+"Now let's check your understanding."
+
+Then show the concept-check interaction.
+
+==================================================
+SCREEN 3 — CONCEPT CHECK
+==================================================
+
+Display one short-answer learning challenge.
+
+Example:
+
+"Explain in your own words what photosynthesis is and what plants need for it."
+
+Provide:
+
+- textarea
+- Submit Answer button
+- Skip button
+
+The UI should make it obvious that the student is expected to THINK and respond, not simply read.
+
+Do not add multiple quizzes or multiple learning activities.
+
+Keep ONE strong interaction.
+
+==================================================
+SCREEN 4 — FEEDBACK
+==================================================
+
+After submitting:
+
+Call:
+
+POST /api/interactions
+
+using the existing API contract.
+
+Display the returned:
+
+- evaluation
+- feedback
+- nextAction
+
+Possible evaluation:
+
+correct
+partially_correct
+incorrect
+
+Possible nextAction:
+
+COMPLETE
+RETRY
+SIMPLIFY
+
+For a correct response:
+
+Show a positive but restrained success state.
+
+Provide:
+
+"Continue Learning"
+"Finish Session"
+
+For an incorrect or partially correct response:
+
+Show constructive feedback.
+
+Allow another attempt.
+
+If the backend returns SIMPLIFY:
+
+Clearly communicate that the explanation is being simplified / that the student can try again with additional guidance.
+
+IMPORTANT:
+Do not invent a different evaluation system in the frontend.
+
+Use the backend's response.
+
+==================================================
+ATTEMPTS
+==================================================
+
+Track the current attempt number in the frontend.
+
+The first submitted answer must use:
+
+attemptNumber: 1
+
+The next attempt:
+
+attemptNumber: 2
+
+and so on.
+
+Do not reset the attempt number when the user retries.
+
+==================================================
+SCREEN 5 — SKIP
+==================================================
+
+If the student chooses Skip:
+
+- do not pretend they successfully understood the concept
+- show a clear skipped state
+- allow them to finish or continue
+
+Use the existing backend capabilities where appropriate.
+
+Do not create a new database model just for skip behavior.
+
+==================================================
+SCREEN 6 — SESSION COMPLETE
+==================================================
+
+When the student finishes:
+
+Display:
+
+- topic
+- original question
+- number of attempts
+- final learning outcome
+
+Example:
+
+"Learning session complete"
+
+"2 attempts"
+
+"Concept check completed"
+
+Keep this screen simple.
+
+==================================================
+SESSION RESTORATION
+==================================================
+
+The backend already supports:
+
+GET /api/sessions/:id
+
+Use this to restore a session if the page is refreshed.
+
+Store the session ID in an appropriate way such as URL state or localStorage.
+
+On page load:
+
+- if an existing session ID exists
+- request the session
+- restore the appropriate UI state
+
+Do not lose persisted interactions after refresh.
+
+If the session does not exist:
+
+- clear invalid local session state
+- return the user to the start screen
+
+==================================================
+ERROR HANDLING
+==================================================
+
+Implement frontend handling for:
+
+1. Backend unavailable
+2. Failed session creation
+3. Failed question request
+4. Failed interaction submission
+5. Invalid session
+6. Empty topic
+7. Empty question
+8. Empty student response
+
+Show friendly messages.
+
+Do not expose raw stack traces.
+
+Provide Retry where appropriate.
+
+==================================================
+LOADING STATES
+==================================================
+
+Every API operation should have a clear loading state.
+
+Buttons must be disabled while the corresponding request is running.
+
+Prevent accidental double submissions.
+
+==================================================
+COMPONENT STRUCTURE
+==================================================
+
+Do NOT put the entire application in one component.
+
+Create sensible React components, for example:
+
+- StartLearning
+- ExplanationView
+- ConceptCheck
+- FeedbackView
+- SessionComplete
+- LoadingState
+- ErrorMessage
+
+Use the existing project structure if one already exists.
+
+Do not create components unnecessarily.
+
+==================================================
+DESIGN
+==================================================
+
+Create a clean, modern educational interface.
+
+Prioritize:
+
+- readability
+- clear hierarchy
+- simple navigation
+- accessible labels
+- good spacing
+- responsive layout
+- obvious primary actions
+
+The learning progression should be visually obvious:
+
+QUESTION
+↓
+EXPLANATION
+↓
+CHECK UNDERSTANDING
+↓
+YOUR RESPONSE
+↓
+FEEDBACK
+↓
+RETRY / CONTINUE
+↓
+COMPLETE
+
+The concept-check stage should feel like the most important interaction.
+
+Avoid:
+
+- dashboard-style UI
+- unnecessary sidebars
+- excessive animations
+- excessive gradients
+- unnecessary icons
+- login/signup
+- chat history
+- admin pages
+- unnecessary features
+
+==================================================
+IMPORTANT TECHNICAL RULE
+==================================================
+
+Use the existing API base configuration.
+
+Do not hardcode production URLs.
+
+If the project already has an API helper/client, reuse it.
+
+If not, create a small API client/helper rather than duplicating fetch logic throughout components.
+
+==================================================
+TESTING
+==================================================
+
+After implementation manually test:
+
+1. Start screen loads
+2. Empty topic validation
+3. Empty question validation
+4. Successful session creation
+5. Explanation appears
+6. Concept check appears
+7. Empty answer validation
+8. Incorrect answer
+9. Retry
+10. Second attempt
+11. Correct answer
+12. Completion screen
+13. Page refresh
+14. Session restoration
+15. Backend failure state
+
+Make sure the existing backend still works.
+
+Do NOT modify the Prisma schema or database migrations.
+
+At the end provide:
+
+1. Frontend components created/modified
+2. API integration implemented
+3. User flow tested
+4. Edge cases tested
+5. Any issues that remain
+
+STOP after completing this task.
+
+Do not continue to documentation or deployment.

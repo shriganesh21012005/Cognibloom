@@ -1,0 +1,296 @@
+Continue from the existing CogniBloom project.
+
+IMPORTANT:
+The database layer is already COMPLETE and VERIFIED.
+
+DO NOT:
+- redesign the Prisma schema
+- create another database
+- create another migration unless absolutely required
+- modify the frontend
+- add authentication
+- integrate OpenAI/Gemini/Claude
+- replace existing database services
+- rebuild existing functionality
+
+The existing database contains:
+
+LearningSession:
+- id
+- topic
+- question
+- explanation
+- status
+- createdAt
+- updatedAt
+
+Interaction:
+- id
+- sessionId
+- interactionType
+- prompt
+- studentResponse
+- evaluation
+- isCorrect
+- attemptNumber
+- createdAt
+
+Existing database service:
+server/src/services/learningDatabase.ts
+
+Now implement ONLY the backend REST API layer on top of the existing database service.
+
+## REQUIRED ENDPOINTS
+
+### 1. POST /api/sessions
+
+Create a new learning session.
+
+Input:
+
+{
+  "topic": "Photosynthesis",
+  "question": "What is photosynthesis?"
+}
+
+Create and persist the session.
+
+The initial status should be IN_PROGRESS.
+
+Return the created session ID and relevant session information.
+
+---
+
+### 2. POST /api/questions
+
+Input:
+
+{
+  "sessionId": 1,
+  "question": "What is photosynthesis?"
+}
+
+Validate that:
+- sessionId exists
+- question is not empty
+
+Store/update the question in the session.
+
+Generate a MOCK explanation.
+
+For example:
+
+Question:
+"What is photosynthesis?"
+
+Explanation:
+"Photosynthesis is the process by which green plants use sunlight, carbon dioxide and water to produce glucose and oxygen."
+
+IMPORTANT:
+
+We are deliberately using MOCK AI responses for now.
+
+Do NOT call any external AI service.
+
+Create a small mock explanation service/data structure so that this can later be replaced with a real AI service without rewriting the API layer.
+
+---
+
+### 3. GET /api/sessions/:id
+
+Return:
+
+- session information
+- topic
+- question
+- explanation
+- status
+- interactions
+- attempt information
+
+The response should allow the frontend to restore an existing learning session after refresh.
+
+Return 404 if the session does not exist.
+
+---
+
+### 4. POST /api/interactions
+
+Input:
+
+{
+  "sessionId": 1,
+  "interactionType": "SHORT_ANSWER",
+  "studentResponse": "Plants use sunlight to make food",
+  "attemptNumber": 1
+}
+
+Validate:
+- session exists
+- studentResponse is not empty
+- attemptNumber is valid
+
+For this prototype, evaluate the response using deterministic MOCK evaluation logic.
+
+Return a structured result containing:
+
+- evaluation
+- isCorrect
+- feedback
+- nextAction
+- attemptNumber
+
+Possible evaluation values:
+
+- correct
+- partially_correct
+- incorrect
+
+Possible nextAction values:
+
+- COMPLETE
+- RETRY
+- SIMPLIFY
+
+The evaluation does NOT need to be intelligent AI evaluation.
+
+Keep the logic simple and deterministic.
+
+For example, for a photosynthesis question:
+
+A response containing concepts such as:
+- sunlight
+- plants
+- glucose/food
+- carbon dioxide
+- water
+
+can be considered correct or partially correct.
+
+Do NOT make this overly complicated.
+
+---
+
+### 5. POST /api/feedback
+
+Allow the frontend to submit session feedback.
+
+Input can contain:
+
+{
+  "sessionId": 1,
+  "rating": 4,
+  "comment": "The explanation was easy to understand"
+}
+
+IMPORTANT:
+
+Before adding a new database model, inspect the existing schema.
+
+Only persist feedback if there is an appropriate existing structure.
+
+If the current schema does not support feedback, DO NOT redesign the database unnecessarily.
+
+Instead, document this limitation and keep the endpoint implementation minimal or explain the required future schema change.
+
+---
+
+## ERROR HANDLING
+
+Implement reasonable validation and error handling.
+
+Handle:
+
+- missing fields
+- empty question
+- empty student response
+- invalid session ID
+- non-existent session
+- malformed request
+- database failure
+- unexpected server error
+
+Use appropriate HTTP status codes.
+
+Return consistent JSON error responses.
+
+Example:
+
+{
+  "error": "Session not found"
+}
+
+---
+
+## ARCHITECTURE
+
+Keep the existing separation:
+
+routes
+→ controllers
+→ services
+→ database service
+→ Prisma
+→ SQLite
+
+Do not put all logic directly inside route handlers.
+
+Create a mock learning/explanation service where appropriate.
+
+Keep the implementation understandable for a candidate assignment.
+
+---
+
+## IMPORTANT PRODUCT BEHAVIOUR
+
+The backend should support this learning flow:
+
+Student question
+↓
+Explanation
+↓
+Concept check
+↓
+Student response
+↓
+Evaluation
+↓
+Feedback
+↓
+Retry OR completion
+
+The backend must NOT simply behave like a normal chatbot that returns an answer and ends the session.
+
+---
+
+## TESTING
+
+After implementing the APIs:
+
+1. Start the backend.
+2. Test POST /api/sessions.
+3. Test POST /api/questions.
+4. Test GET /api/sessions/:id.
+5. Test POST /api/interactions.
+6. Test incorrect response.
+7. Test correct response.
+8. Test invalid session.
+9. Test empty question.
+10. Test empty student response.
+
+Verify that data is actually persisted in SQLite.
+
+Do not modify the frontend in this task.
+
+At the end provide:
+
+1. Exact API endpoints created
+2. Request examples
+3. Response examples
+4. Files created/modified
+5. Tests performed and their results
+6. Any limitations or decisions
+
+STOP after completing this task.
+
+Do NOT continue to frontend implementation.

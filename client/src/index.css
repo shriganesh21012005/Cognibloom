@@ -1,0 +1,59 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+  color: #18201d;
+  background: #f7f8f2;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+}
+
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid rgba(82, 114, 96, 0.35);
+  outline-offset: 3px;
+}
+
+@layer components {
+  .eyebrow {
+    @apply text-sm font-semibold uppercase tracking-[0.2em] text-moss;
+  }
+
+  .field {
+    @apply w-full rounded-2xl border border-ink/15 bg-white px-4 py-3 text-base text-ink shadow-sm transition placeholder:text-ink/30 focus:border-moss focus:outline-none focus:ring-4 focus:ring-moss/10 disabled:cursor-not-allowed disabled:bg-ink/5;
+  }
+
+  .field-error {
+    @apply border-red-300 focus:border-red-400 focus:ring-red-100;
+  }
+
+  .field-message {
+    @apply mt-2 block text-xs font-medium text-red-700;
+  }
+
+  .button-primary {
+    @apply inline-flex min-h-12 items-center justify-center rounded-2xl bg-moss px-5 py-3 text-sm font-bold text-white shadow-[0_8px_20px_rgba(82,114,96,0.2)] transition hover:bg-moss/90 focus:outline-none focus:ring-4 focus:ring-moss/20 disabled:cursor-not-allowed disabled:bg-moss/45 disabled:shadow-none;
+  }
+
+  .button-secondary {
+    @apply inline-flex min-h-12 items-center justify-center rounded-2xl border border-ink/15 bg-white px-5 py-3 text-sm font-bold text-ink/70 transition hover:border-moss/40 hover:text-moss focus:outline-none focus:ring-4 focus:ring-moss/15 disabled:cursor-not-allowed disabled:opacity-50;
+  }
+}

@@ -1,0 +1,374 @@
+Create and add a new root-level file named APPROACH.md.
+
+IMPORTANT:
+- Do NOT modify any application code.
+- Do NOT modify the database schema, migrations, APIs, dependencies, or configuration.
+- This task is documentation only.
+- Base every statement on the CURRENT IMPLEMENTATION of the project.
+- Do not claim features that are not actually implemented.
+- Keep the document concise, thoughtful, and evaluator-friendly.
+- Write it as a candidate's product and engineering reasoning for the Spiral Infra / CogniBloom "Product Thinking & Full Stack Challenge".
+- Do not make it sound like marketing copy.
+- Do not mention that AI wrote the document.
+
+The assignment evaluates:
+1. Problem Understanding – 15%
+2. Product Thinking / User Empathy – 20%
+3. Solution / User Flow – 15%
+4. Reasoning / Trade-offs – 15%
+5. Technical Architecture – 10%
+6. Backend / API – 10%
+7. Frontend / UX – 5%
+8. Database – 5%
+9. Documentation – 5%
+
+Create APPROACH.md with exactly these major sections:
+
+# Approach
+
+## 1. Problem Understanding
+
+Explain the core problem:
+An AI tutor can provide a technically correct explanation, but the student may simply read it and leave without actually understanding or remembering the concept.
+
+Explain the product problem as:
+The missing step is an active learning interaction between "AI explains" and "student leaves".
+
+Make the distinction between:
+- receiving information
+- demonstrating understanding
+
+Do not claim that every student fails this way; describe it as the key failure mode the product is designed to address.
+
+## 2. User
+
+Define the primary user as:
+A student who uses an AI tutor to understand a concept or solve a learning question.
+
+Describe the user's goal:
+- Understand the concept
+- Check whether they actually understood it
+- Continue learning without unnecessary friction
+
+Describe the user's likely frustration:
+They may feel that an explanation makes sense while reading it, but may not be able to explain the idea themselves.
+
+## 3. Assumptions
+
+List the main assumptions behind the solution, including:
+- The student has already asked a learning question.
+- The AI explanation is the starting point for learning, not the end point.
+- A short active-recall interaction is more useful than immediately showing another long explanation.
+- Students need feedback when their understanding is incomplete.
+- A low-friction interaction is more suitable for a small learning session than a large dashboard or course system.
+- AI can be mocked for the prototype because the assignment evaluates the learning interaction and engineering design rather than model quality.
+
+## 4. Proposed Solution
+
+Explain the product concept "CogniBloom – Active Learning Tutor".
+
+Describe the core interaction:
+
+Student question
+→ AI explanation
+→ "Let's check your understanding"
+→ Student explains the concept in their own words
+→ System evaluates the response
+→ Targeted feedback
+→ Retry if needed
+→ Completion
+
+Explain why "Explain it yourself" was selected:
+- It requires active recall.
+- It reveals whether the student can reconstruct the concept rather than recognize it.
+- It creates a natural opportunity for feedback.
+- It is simple enough to complete in one short session.
+- It directly addresses the assignment's problem of passive consumption.
+
+Explain that the prototype uses deterministic mocked evaluation so the complete experience can be demonstrated reliably.
+
+## 5. User Flow
+
+Describe the actual implemented flow step-by-step:
+
+1. Start Learning
+   - Student enters/selects a topic/question.
+   - Empty input is validated.
+
+2. Explanation
+   - The system generates/displays an explanation.
+   - The student is explicitly encouraged to check their understanding instead of simply leaving.
+
+3. Concept Check
+   - Student is asked to explain the concept in their own words.
+   - Student can submit an answer or skip.
+
+4. Evaluation / Feedback
+   - The backend evaluates the response.
+   - The result can be correct, partially correct, or incorrect.
+   - The UI gives feedback appropriate to the result.
+
+5. Retry
+   - Incorrect or partial responses can be retried.
+   - Attempt numbers are tracked.
+
+6. Completion
+   - A successful interaction can lead to the completed state.
+   - Skipping is clearly treated differently from successfully demonstrating understanding.
+
+7. Restoration
+   - The frontend stores the active session locally and can restore the learning state after refresh.
+
+## 6. Product Decisions
+
+Explain the important decisions:
+
+### Chosen: Explain-it-yourself concept check
+Why:
+- Directly addresses the problem.
+- Small cognitive effort.
+- Produces meaningful evidence of understanding.
+- Easy to complete and evaluate.
+
+### Feedback + Retry
+Why:
+- A wrong answer should not be a dead end.
+- Feedback turns failure into another learning opportunity.
+- Retry supports learning rather than simply scoring the student.
+
+### Low-friction single-session experience
+Why:
+- The assignment asks for a small learning interaction.
+- A dashboard, account system, course catalogue, streak system, etc. would distract from the core problem.
+
+### Local session restoration
+Why:
+- Students may refresh or temporarily leave.
+- Restoring the active session reduces frustration and supports continuity.
+
+## 7. Rejected / Deferred Alternatives
+
+Discuss alternatives that were considered but not implemented in this prototype:
+
+### Multiple-choice quiz
+Rejected as the primary interaction because recognizing the correct option can be easier than generating an explanation independently.
+
+### Large quiz system
+Deferred because it increases scope without directly improving the core learning interaction.
+
+### Confidence rating as the main interaction
+Deferred because confidence is useful metadata, but it does not itself demonstrate understanding.
+
+### Full adaptive difficulty engine
+Deferred because the prototype first needs to prove the core interaction loop.
+
+### Authentication / student dashboard
+Deferred because this is a single-session learning prototype and authentication does not solve the central learning problem.
+
+### Real external AI integration
+Deferred in the prototype so the learning flow remains deterministic, testable, and reliable.
+
+Do not claim these features exist.
+
+## 8. Technical Architecture
+
+Describe the actual architecture:
+
+Frontend:
+React + TypeScript + Vite + Tailwind CSS
+
+Backend:
+Node.js + Express + TypeScript
+
+Database:
+SQLite + Prisma
+
+Communication:
+REST APIs
+
+Architecture:
+
+React UI
+↓
+Shared API helper
+↓
+Express routes
+↓
+Controllers
+↓
+Learning services
+↓
+Database helpers
+↓
+Prisma
+↓
+SQLite
+
+Explain the separation of responsibilities:
+- Routes define endpoints.
+- Controllers handle HTTP-level concerns.
+- Services contain learning/business logic.
+- Database helpers isolate persistence.
+- Prisma provides typed database access.
+
+Mention that the AI behavior is currently represented by a deterministic mock service.
+
+## 9. Backend / API Design
+
+Document the implemented endpoints:
+
+POST /api/sessions
+Creates a learning session.
+
+POST /api/questions
+Generates the explanation/question content used by the learning flow.
+
+GET /api/sessions/:id
+Retrieves the persisted session and its interactions.
+
+POST /api/interactions
+Submits the student's concept-check response and evaluates it.
+
+POST /api/feedback
+Accepts feedback input and validates the request. Be precise: feedback is currently accepted by the endpoint but is not persisted because the current schema does not contain a feedback model/field.
+
+Also mention:
+- Request validation
+- Error handling
+- Malformed JSON handling
+- Unknown-route handling
+- Backend failure handling in the frontend
+
+Do not invent additional endpoints.
+
+## 10. Database Design
+
+Document the actual Prisma models:
+
+### LearningSession
+Stores:
+- id
+- topic
+- question
+- explanation
+- status
+- createdAt
+- updatedAt
+- interactions
+
+### Interaction
+Stores:
+- id
+- sessionId
+- interactionType
+- prompt
+- studentResponse
+- evaluation
+- isCorrect
+- attemptNumber
+- createdAt
+
+Mention the session status values:
+- IN_PROGRESS
+- COMPLETED
+- ABANDONED
+
+Mention the interaction type structure currently defined in Prisma.
+
+Explain why persistence matters:
+The learning interaction should not exist only in React state; the backend should have a durable representation of the learning session and responses.
+
+## 11. Edge Cases Considered
+
+Document the actual handling:
+
+- Empty question/input → validation prevents submission.
+- Student gives an incorrect answer → feedback + retry.
+- Student gives a partially correct answer → targeted feedback / retry path.
+- Student skips → separate skipped state; skipping is not presented as successful learning.
+- Interaction API failure → friendly error and retry.
+- Backend unavailable → clear error state.
+- Page refresh → active session can be restored locally.
+- Student leaves midway → local restoration helps preserve the active session.
+- Repeated difficulty → retry remains available and the feedback can guide another attempt.
+- AI unavailable → prototype uses deterministic mocked learning behavior rather than depending on an external AI service.
+
+Be careful not to claim that repeated-failure escalation is a sophisticated adaptive engine; it is not.
+
+## 12. Trade-offs
+
+Explain these honestly:
+
+### Mocked AI instead of real AI
+Trade-off:
+Less realism, but deterministic behavior makes the prototype reliable and keeps the focus on the product interaction.
+
+### One core interaction type
+Trade-off:
+Less variety, but clearer validation of the central hypothesis.
+
+### No authentication
+Trade-off:
+No multi-user account system, but much lower complexity for a single-session assignment prototype.
+
+### SQLite
+Trade-off:
+Simple and fast for a small prototype, rather than introducing the operational complexity of a hosted production database.
+
+### No analytics dashboard
+Trade-off:
+Metrics are defined conceptually but not instrumented because the assignment does not require analytics implementation.
+
+### Feedback endpoint not persisted
+Be transparent:
+The endpoint validates and accepts feedback, but the current data model does not persist it. This keeps the current schema focused on the learning session and interaction loop.
+
+## 13. Success Metrics
+
+Clearly separate prototype success from production metrics.
+
+For a real product, useful metrics would include:
+
+1. Concept-check completion rate
+   Percentage of students who attempt the active-learning step after receiving an explanation.
+
+2. Retry-to-correct rate
+   Percentage of incorrect/partial attempts that become correct after feedback.
+
+3. Drop-off after explanation
+   Measures whether students leave before attempting the concept check.
+
+4. Session completion rate
+   Percentage of started sessions reaching a meaningful completion state.
+
+5. Repeat-question rate
+   Whether students need to ask the same question again, which may indicate weak understanding.
+
+Explain that these metrics are proposed product metrics and are NOT currently instrumented in the prototype.
+
+## 14. What I Would Improve With More Time
+
+Prioritize improvements rather than listing random features:
+
+### 1. Real AI evaluation
+Use an AI model to evaluate explanations more semantically while keeping validation/safety constraints.
+
+### 2. Adaptive follow-up interactions
+If the student repeatedly struggles, switch from free-form explanation to a simpler example, guided question, or multiple-choice scaffold.
+
+### 3. Persistent feedback and analytics
+Store explicit feedback and instrument the learning funnel.
+
+### 4. Better session continuity
+Support authenticated users and persistent learning history.
+
+### 5. More interaction types
+Add carefully selected recall, application, and practical-example questions while keeping the core flow simple.
+
+End the document with a short statement that the prototype intentionally focuses on proving one learning loop rather than building a large tutoring platform.
+
+Finally:
+- Make sure the Markdown is clean and professionally formatted.
+- Make sure there are no false claims.
+- Do not modify any other file.
+- After creating APPROACH.md, report exactly what file was created and confirm that no code was changed.

@@ -1,0 +1,19 @@
+{
+  "name": "cognibloom-active-learning-tutor",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": [
+    "client",
+    "server"
+  ],
+  "scripts": {
+    "dev": "concurrently -k -n frontend,backend -c cyan,green \"npm run dev --workspace client\" \"npm run dev --workspace server\"",
+    "build": "npm run build --workspace client && npm run build --workspace server",
+    "db:generate": "npm run db:generate --workspace server",
+    "db:push": "npm run db:push --workspace server",
+    "start": "npm run start --workspace server"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}

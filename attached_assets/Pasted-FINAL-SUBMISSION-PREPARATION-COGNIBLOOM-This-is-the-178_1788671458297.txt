@@ -1,0 +1,541 @@
+FINAL SUBMISSION PREPARATION — COGNIBLOOM
+==========================================
+
+This is the FINAL preparation pass for my CogniBloom Product Thinking & Full Stack Challenge assignment.
+
+IMPORTANT:
+- Do NOT rebuild the project.
+- Do NOT redesign the UI.
+- Do NOT add unnecessary features.
+- Do NOT change the core product idea.
+- Do NOT replace the existing frontend/backend architecture.
+- Do NOT integrate a real AI/LLM.
+- Do NOT add authentication, analytics, dashboards, extra interaction types, or other scope.
+- Preserve the current implementation wherever it already works.
+- Make only changes that are genuinely necessary for final submission quality.
+
+The goal is to finish the project, verify the complete frontend/backend/database flow, perform a fast but thorough final test, and leave the repository ready to push to GitHub and submit to company officials.
+
+==================================================
+1. FIRST: INSPECT THE CURRENT PROJECT
+==================================================
+
+Before changing anything, inspect the COMPLETE current project.
+
+Verify:
+
+Frontend:
+- React + TypeScript + Vite
+- All current learning-flow components
+- API helper/types
+- routing/state/session restoration logic
+- loading/error states
+- responsive layout
+- accessibility
+
+Backend:
+- Node + Express + TypeScript
+- routes
+- controllers
+- services
+- validation
+- error handling
+- Prisma/database layer
+- mock AI logic
+
+Database:
+- Prisma schema
+- SQLite database
+- migrations
+- LearningSession
+- Interaction
+- LearningSessionStatus
+- InteractionType
+
+Documentation:
+- README.md
+- APPROACH.md
+
+Do not modify anything during this inspection.
+
+==================================================
+2. VERIFY THE CORE PRODUCT FLOW
+==================================================
+
+The final product flow must remain:
+
+Student enters/selects topic/question
+        ↓
+Starts learning session
+        ↓
+Receives AI explanation
+        ↓
+Concept Check / Explain-It-Yourself interaction
+        ↓
+Student submits answer
+        ↓
+System evaluates answer
+        ↓
+Targeted feedback is shown
+        ↓
+Student can retry or continue
+        ↓
+Student completes or skips the session
+
+This is the core product and MUST NOT be redesigned.
+
+==================================================
+3. FIX ONLY THE SESSION STATUS CONSISTENCY ISSUE
+==================================================
+
+There is one known minor issue that should be corrected.
+
+The database already has:
+
+- IN_PROGRESS
+- COMPLETED
+- ABANDONED
+
+The UI already supports skipping a learning interaction/session.
+
+When the user chooses the existing Skip → Finish Session flow, make sure the backend/database records the session as:
+
+ABANDONED
+
+instead of leaving it as:
+
+IN_PROGRESS
+
+Implement this in the SMALLEST CLEANEST WAY possible.
+
+Preferred behavior:
+
+Skip / Finish
+    ↓
+Backend updates LearningSession.status = ABANDONED
+    ↓
+Frontend shows the existing skipped/finished state
+
+Requirements:
+- Reuse the existing LearningSessionStatus enum.
+- Reuse existing database/service architecture.
+- Do not create a new database model.
+- Do not add unnecessary complexity.
+- Do not break the existing completion flow.
+- A genuinely completed session must still be stored as COMPLETED.
+- A skipped/abandoned session must be stored as ABANDONED.
+- An in-progress session must remain IN_PROGRESS.
+
+Use an appropriate REST endpoint consistent with the existing API architecture.
+
+==================================================
+4. VERIFY COMPLETION STATUS TOO
+==================================================
+
+Check the existing completion flow.
+
+When a student successfully completes the learning session, verify that:
+
+LearningSession.status = COMPLETED
+
+is persisted in the database.
+
+If this is already implemented correctly:
+- DO NOT change it.
+
+If it is not persisted:
+- make the smallest clean fix using the existing architecture.
+
+Do NOT redesign the completion screen.
+
+==================================================
+5. VERIFY THE EXISTING APIs
+==================================================
+
+Verify that the existing APIs work correctly.
+
+Expected current API structure includes:
+
+POST /api/sessions
+POST /api/questions
+POST /api/interactions
+GET /api/sessions/:id
+POST /api/feedback
+
+Plus the minimal endpoint needed to persist ABANDONED status if required.
+
+For every API:
+- validate input
+- return sensible HTTP status
+- return useful JSON
+- handle invalid/missing data
+- handle malformed requests gracefully
+- do not expose internal stack traces/secrets
+
+Do NOT add APIs that are not needed.
+
+==================================================
+6. VERIFY DATABASE PERSISTENCE
+==================================================
+
+Verify that the following are persisted correctly:
+
+LearningSession:
+- id
+- topic
+- question
+- explanation
+- status
+- timestamps
+
+Interaction:
+- id
+- sessionId
+- interactionType
+- prompt
+- studentResponse
+- evaluation
+- isCorrect
+- attemptNumber
+- createdAt
+
+Verify that:
+- interactions belong to the correct session
+- attempt numbers work
+- incorrect → retry creates/records the correct interaction
+- correct completion works
+- skipped session becomes ABANDONED
+
+Do not redesign the schema.
+
+==================================================
+7. FAST BUT COMPLETE FRONTEND TEST
+==================================================
+
+Perform an end-to-end browser test of the existing UI.
+
+Test this exact flow:
+
+TEST A — Normal successful flow
+1. Open the app.
+2. Enter a valid learning question/topic.
+3. Start the session.
+4. Confirm explanation appears.
+5. Continue to Concept Check.
+6. Submit a valid answer.
+7. Confirm evaluation/feedback appears.
+8. If incorrect, retry.
+9. Submit a correct answer.
+10. Confirm completion screen.
+11. Verify backend/database status = COMPLETED.
+
+TEST B — Incorrect answer and retry
+1. Start another session.
+2. Submit a clearly incorrect/poor answer.
+3. Confirm feedback is appropriate.
+4. Confirm retry is available.
+5. Submit a better/correct answer.
+6. Confirm completion works.
+
+TEST C — Skip flow
+1. Start another session.
+2. Reach the learning interaction.
+3. Use the existing Skip flow.
+4. Finish the session.
+5. Confirm the existing skipped/finished UI appears.
+6. Verify database status = ABANDONED.
+7. Refresh/open the session if supported and confirm it is not treated as an active IN_PROGRESS session.
+
+TEST D — Empty input
+1. Try submitting an empty question.
+2. Confirm validation prevents submission.
+3. Try submitting an empty concept-check answer.
+4. Confirm validation prevents submission.
+
+TEST E — Refresh/session restoration
+1. Start a session.
+2. Refresh during the learning flow.
+3. Confirm the existing restoration behavior works.
+4. Confirm no duplicate session is unnecessarily created.
+
+TEST F — API failure
+Simulate/force an API failure if practical.
+Verify:
+- friendly error state
+- loading state ends
+- user has a clear retry path
+- UI does not become stuck
+
+TEST G — Responsive UI
+Quickly verify desktop and approximately 390px mobile width.
+Check:
+- no horizontal overflow
+- buttons remain usable
+- text is readable
+- cards/forms do not break
+
+Do NOT spend time on cosmetic redesign.
+
+==================================================
+8. VERIFY ERROR HANDLING
+==================================================
+
+Check the existing error handling for:
+
+- empty input
+- invalid session ID
+- invalid interaction submission
+- malformed JSON/request
+- unknown API route
+- database/API failure
+- unavailable backend
+
+Ensure the frontend displays friendly messages rather than raw server errors.
+
+If already correct, leave it unchanged.
+
+==================================================
+9. VERIFY README.md
+==================================================
+
+README.md must describe the ACTUAL current implementation.
+
+Make sure it contains:
+
+- Project overview
+- Problem being solved
+- Solution
+- Active learning flow
+- Key features that are ACTUALLY implemented
+- Tech stack
+- Architecture
+- Project structure
+- Frontend setup
+- Backend setup
+- Database setup/migration commands that actually work
+- Environment/configuration requirements
+- API documentation
+- Database model overview
+- Error handling
+- Testing/verification coverage
+- Product decisions/trade-offs
+- Known limitations / intentionally omitted work
+- Future improvements
+
+IMPORTANT:
+Do NOT claim features that are not implemented.
+
+Make sure there are no outdated statements such as saying learning-session APIs are not implemented.
+
+Make sure setup commands match the actual package/workspace scripts.
+
+==================================================
+10. VERIFY APPROACH.md
+==================================================
+
+APPROACH.md is REQUIRED for the assignment.
+
+Make sure it exists at the repository root.
+
+It must cover:
+
+- Problem Understanding
+- User
+- Assumptions
+- Proposed Solution
+- User Flow
+- Product Decisions
+- Rejected Alternatives
+- Technical Decisions
+- Trade-offs
+- Intentionally Omitted Work
+- Success Metrics
+- What would be improved with more time
+
+Keep it concise and based ONLY on the actual current implementation.
+
+Do not invent functionality.
+
+==================================================
+11. SECURITY / SECRET AUDIT
+==================================================
+
+Perform a final secret/config audit.
+
+Check for:
+- API keys
+- passwords
+- tokens
+- credentials
+- private secrets
+- real .env files
+- accidentally committed secrets
+
+Ensure:
+- .env is ignored
+- .env.example contains only safe placeholder/example values
+- no secrets are present in source code
+- no secrets are present in README/APPROACH.md
+
+Do NOT delete legitimate configuration that the app needs.
+
+==================================================
+12. DEPENDENCY / BUILD CHECK
+==================================================
+
+Run the appropriate final checks.
+
+Frontend:
+- TypeScript compilation
+- production build
+
+Backend:
+- TypeScript compilation/build
+- Prisma validation/generation if applicable
+
+Run the actual commands supported by this project.
+
+Do not introduce dependency upgrades unless absolutely necessary.
+
+If there are warnings that do not affect functionality, do not waste time changing unrelated code.
+
+==================================================
+13. DATABASE / MIGRATION CHECK
+==================================================
+
+Verify:
+- Prisma schema is valid.
+- Migrations are valid.
+- Database can be created/migrated from a clean state.
+- Application can connect successfully.
+- No unnecessary test records remain in the submitted local database.
+
+If the repository intentionally includes the SQLite database, leave it in the state appropriate for the project.
+
+Do NOT modify migration history unnecessarily.
+
+==================================================
+14. FINAL CODE CLEANUP
+==================================================
+
+Only perform safe cleanup such as:
+- unused imports
+- obvious dead code
+- accidental debug console logs
+- temporary test text
+- broken comments
+- obvious inconsistent naming
+
+Do NOT refactor working architecture just for style.
+
+Do NOT change the UI design unless something is actually broken.
+
+==================================================
+15. FINAL ASSIGNMENT REQUIREMENTS CHECK
+==================================================
+
+Compare the FINAL PROJECT against these requirements:
+
+1. User can enter/select learning topic.
+2. User can ask/start learning interaction.
+3. User receives explanation.
+4. User interacts with learning mechanism.
+5. User receives appropriate response.
+6. User can continue or finish.
+7. Backend/API exists.
+8. Persistent data storage exists.
+9. Frontend communicates with backend.
+10. Error handling exists.
+11. Clean understandable code.
+12. Git-ready repository.
+13. README.md exists.
+14. APPROACH.md exists.
+15. Relevant sessions/interactions/progress are persisted.
+16. Edge cases are considered.
+17. Product decisions are documented.
+18. Success metrics are documented.
+19. Trade-offs/omitted work are documented.
+20. AI can remain mocked.
+
+The assignment explicitly values problem understanding and product thinking, not feature quantity.
+
+==================================================
+16. FINAL RUBRIC SELF-AUDIT
+==================================================
+
+After testing, produce a concise final report with:
+
+Problem Understanding — /15
+Product Thinking & User Empathy — /20
+Solution & User Flow — /15
+Reasoning & Trade-offs — /15
+Technical Architecture — /10
+Backend/API — /10
+Frontend/UX — /5
+Database — /5
+Documentation — /5
+
+For each:
+- status: PASS / MINOR / FAIL
+- one short reason
+
+Then give:
+TOTAL ESTIMATED SCORE: XX/100
+
+Do not inflate the score. Be honest.
+
+==================================================
+17. FINAL SUBMISSION CHECK
+==================================================
+
+Before finishing, verify the repository contains the final required files:
+
+README.md
+APPROACH.md
+client/
+server/
+package.json
+package-lock.json
+.gitignore
+
+and all necessary Prisma/database/migration/configuration files.
+
+Make sure no build/cache/node_modules/secrets are unnecessarily included in Git.
+
+==================================================
+18. MOST IMPORTANT RULE
+==================================================
+
+After all checks:
+
+IF EVERYTHING PASSES:
+- Do NOT make any more changes.
+- Tell me clearly: "FINAL SUBMISSION READY".
+- Give me the exact Git commands I should run to commit and push the final project to GitHub.
+- Tell me what I should verify on GitHub after pushing.
+
+IF SOMETHING IMPORTANT FAILS:
+- Fix only the important issue.
+- Re-run the relevant test.
+- Re-run the build.
+- Re-check the affected flow.
+
+Do NOT keep iterating unnecessarily.
+
+The objective is to leave me with a stable, tested, documented, GitHub-ready final submission that I can provide to Spiral Infra/CogniBloom company officials.
+
+At the very end, give me a concise checklist:
+
+[ ] Frontend tested
+[ ] Backend tested
+[ ] Database tested
+[ ] Completion persistence tested
+[ ] Abandoned persistence tested
+[ ] Error handling tested
+[ ] Responsive UI tested
+[ ] README final
+[ ] APPROACH final
+[ ] Secret audit passed
+[ ] Production builds passed
+[ ] Git-ready
+[ ] FINAL SUBMISSION READY

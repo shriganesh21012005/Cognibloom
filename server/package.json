@@ -1,0 +1,25 @@
+{
+  "name": "@cognibloom/server",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "DATABASE_URL=${DATABASE_URL:-file:./dev.db} tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "DATABASE_URL=${DATABASE_URL:-file:./dev.db} node dist/index.js",
+    "db:generate": "prisma generate",
+    "db:push": "prisma db push",
+    "db:migrate": "prisma migrate dev"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.2.1",
+    "express": "^4.21.2"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.10.5",
+    "prisma": "^6.2.1",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.3"
+  }
+}
