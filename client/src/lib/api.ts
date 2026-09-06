@@ -24,7 +24,9 @@ async function request<T>(
   let response: Response;
 
   try {
-    response = await fetch(path, {
+    const apiBaseUrl = import.meta.env.VITE_API_URL ?? "";
+
+    response = await fetch(`${apiBaseUrl}${path}`, {
       ...options,
       headers: {
         "Content-Type": "application/json",
@@ -50,9 +52,9 @@ async function request<T>(
   if (!response.ok) {
     const errorMessage =
       typeof payload === "object" &&
-      payload !== null &&
-      "error" in payload &&
-      typeof payload.error === "string"
+        payload !== null &&
+        "error" in payload &&
+        typeof payload.error === "string"
         ? payload.error
         : "Something went wrong. Please try again.";
     throw new ApiClientError(errorMessage, response.status);
